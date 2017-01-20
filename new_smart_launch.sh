@@ -19,6 +19,7 @@ then
     sleep 1 
   done 
 fi
+crond
 # Setting initial command
 factorio_command="/opt/factorio/bin/x64/factorio"
 # Include server-settings.json if one or more variables are populated
@@ -98,6 +99,9 @@ cat << EOF > $SERVER_SETTINGS
 "token": "$FACTORIO_USER_TOKEN",
 
 "game_password": "$FACTORIO_SERVER_GAME_PASSWORD",
+"autosave_interval": 5,
+"autosave_slots": 4,
+"autosave_only_on_server": true,
 
 "_comment_verify_user_identity": "When set to true, the server will only allow clients that have a valid Factorio.com account",
 "verify_user_identity": "$FACTORIO_SERVER_VERIFY_IDENTITY"
@@ -178,7 +182,11 @@ then
   fi
   factorio_command="$factorio_command --start-server-load-latest"
 else
-  factorio_command="$factorio_command --start-server $FACTORIO_SAVE"
+  echo "###"
+  echo "# Downloading save file $FACTORIO_SAVE to save.zip"
+  echo "###"
+  curl -L $FACTORIO_SAVE > ./save.zip
+  factorio_command="$factorio_command --start-server ./save.zip"
 fi
 echo "###"
 echo "# Launching Game"
